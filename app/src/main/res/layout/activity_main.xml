@@ -1,0 +1,51 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/speedInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Initial Speed (m/s)"
+        android:inputType="numberDecimal"/>
+
+    <EditText
+        android:id="@+id/angleInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Angle (degrees)"
+        android:inputType="numberDecimal"/>
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Simulation"/>
+
+    <TextView
+        android:id="@+id/timeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Time: 0s"/>
+
+    <TextView
+        android:id="@+id/positionXTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Position X: 0m"/>
+
+    <TextView
+        android:id="@+id/positionYTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Position Y: 0m"/>
+
+    <com.example.throwoblique.GraphView
+        android:id="@+id/graphView"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"/>
+
+</LinearLayout>
