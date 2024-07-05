@@ -14,4 +14,9 @@ public class PhysicsCalculator {
         double angleRad = Math.toRadians(angle);
         return (2 * speed * Math.sin(angleRad)) / GRAVITY;
     }
+
+    public static double calculateFinalXPosition(double speed, double angle, double flightTime) {
+        double angleRad = Math.toRadians(angle);
+        return speed * flightTime * Math.cos(angleRad);
+    }
 }

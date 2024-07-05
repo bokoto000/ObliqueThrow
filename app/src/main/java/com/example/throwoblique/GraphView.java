@@ -16,6 +16,9 @@ public class GraphView extends View {
     private double ballX;
     private double ballY;
     private static final double PADDING_RATIO = 0.1; // 10% padding
+    private static final double PADDING_RATIO_X = 0.2; // 20% padding
+
+    private String xAxisLabel, yAxisLabel;
 
     public GraphView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -32,6 +35,12 @@ public class GraphView extends View {
     public void setTrajectory(double[] x, double[] y) {
         trajectoryX = x;
         trajectoryY = y;
+        invalidate();
+    }
+
+    public void setLabels(String xLabel, String yLabel) {
+        xAxisLabel = xLabel;
+        yAxisLabel = yLabel;
         invalidate();
     }
 
@@ -60,15 +69,28 @@ public class GraphView extends View {
         int width = getWidth();
         int height = getHeight();
 
-        double scaleX = (width * (1 - PADDING_RATIO)) / maxX;
+        double scaleX = (width * (1 - PADDING_RATIO_X)) / maxX;
         double scaleY = (height * (1 - PADDING_RATIO)) / maxY;
         double scale = Math.min(scaleX, scaleY);
 
-        double offsetX = (width - (maxX * scale)) / 2;
+        double offsetX = (width - (maxX * scale)) / 2 + 15;
         double offsetY = (height - (maxY * scale)) / 2;
 
         // Draw X and Y axis labels
         drawAxisLabels(canvas, width, height, offsetX, offsetY);
+        // Draw Y-axis label ("Height")
+        float yAxisLabelXPosition = (float) offsetX + 40; // Adjust as necessary for your layout
+        float yAxisLabelYPosition = (float) height / 2;
+        canvas.save();
+        canvas.rotate(-90, yAxisLabelXPosition, yAxisLabelYPosition);
+        canvas.drawText(yAxisLabel, yAxisLabelXPosition, yAxisLabelYPosition, textPaint);
+        canvas.restore();
+
+        // Draw X-axis label ("Time")
+        float xAxisLabelXPosition = (float) (width / 2 );
+        float xAxisLabelYPosition = (float) (height - offsetY - 10); // Adjust as necessary for your layout
+        canvas.drawText(xAxisLabel, xAxisLabelXPosition, xAxisLabelYPosition, textPaint);
+
 
         // Draw the trajectory
         for (int i = 1; i < trajectoryX.length; i++) {
@@ -90,24 +112,33 @@ public class GraphView extends View {
         paint.setColor(Color.BLACK);
         canvas.drawLine((float) offsetX, (float) (height - offsetY), (float) (offsetX + maxX * scale), (float) (height - offsetY), paint); // bottom
         canvas.drawLine((float) offsetX, (float) (height - offsetY), (float) offsetX, (float) (height - offsetY - maxY * scale), paint); // left
-        canvas.drawLine((float) offsetX, (float) (height - offsetY - maxY * scale), (float) (offsetX + maxX * scale), (float) (height - offsetY - maxY * scale), paint); // top
-        canvas.drawLine((float) (offsetX + maxX * scale), (float) (height - offsetY), (float) (offsetX + maxX * scale), (float) (height - offsetY - maxY * scale), paint); // right
     }
 
     private void drawAxisLabels(Canvas canvas, int width, int height, double offsetX, double offsetY) {
+        double maxX = getMax(trajectoryX);
+        int numberOfXLabels = Math.max(3, (int) (width / 200)); // Adjust the divisor for label spacing
+        double xLabelInterval = maxX / numberOfXLabels;
+
         // Draw Y-axis labels (height)
-        for (int i = 0; i <= 10; i++) {
-            float y = (float) (height - offsetY - i * (height * (1 - PADDING_RATIO)) / 10);
-            canvas.drawText(String.format("%.1f", getMax(trajectoryY) * i / 10), 10, y, textPaint);
+        double maxY = getMax(trajectoryY);
+        int numberOfYLabels = Math.max(3, (int) (height / 120)); // Adjust the divisor for label spacing
+        double yLabelInterval = maxY / numberOfYLabels;
+
+        float labelYXPosition = (float) offsetX - 60; // Move Y-axis labels 60 pixels to the left of the Y-axis
+        for (int i = 0; i <= numberOfYLabels; i++) {
+            float labelY = (float) (height - offsetY - (i * (height - 2 * offsetY) / numberOfYLabels));
+            double heightValue = yLabelInterval * i;
+            canvas.drawText(String.format("%.1f", heightValue), labelYXPosition, labelY, textPaint);
         }
 
         // Draw X-axis labels (time)
-        for (int i = 0; i <= 10; i++) {
-            float x = (float) (offsetX + i * (width * (1 - PADDING_RATIO)) / 10);
-            canvas.drawText(String.format("%.1f", getMax(trajectoryX) * i / 10), x, height - 10, textPaint);
+        float labelYYPosition = height - 30; // Adjust Y position for X-axis labels
+        for (int i = 0; i <= numberOfXLabels; i++) {
+            float x = (float) (offsetX + i * (width - 2 * offsetX) / numberOfXLabels);
+            double timeValue = xLabelInterval * i;
+            canvas.drawText(String.format("%.1f", timeValue), x, labelYYPosition + 15, textPaint);
         }
     }
-
     private double getMax(double[] array) {
         if (array == null || array.length == 0) {
             Log.e("GraphView", "Array is null or empty");
